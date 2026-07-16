@@ -3,8 +3,10 @@ import toast from 'react-hot-toast';
 import { Button, EmptyState, Input, PageTransition, Spinner, ConfirmDialog } from '../../components/ui';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { createProduct, deleteProduct, fetchProducts, updateProduct } from '../../store/products/productsSlice';
+import { fetchWarehouses } from '../../store/warehouses/warehousesSlice';
 import { ProductTable } from '../components/ProductTable';
 import { ProductFormModal } from '../components/ProductFormModal';
+import { ProductStockModal } from '../components/ProductStockModal';
 import type { CreateProductPayload, Product } from '../../types';
 
 export const ProductsPage = () => {
@@ -14,9 +16,11 @@ export const ProductsPage = () => {
   const [isFormOpen, setFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+  const [stockProduct, setStockProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     dispatch(fetchProducts());
+    dispatch(fetchWarehouses());
   }, [dispatch]);
 
   const filteredProducts = useMemo(() => {
@@ -24,7 +28,7 @@ export const ProductsPage = () => {
     if (!term) return items;
     return items.filter(
       (product) =>
-        product.name.toLowerCase().includes(term) || product.category?.toLowerCase().includes(term),
+        product.name.toLowerCase().includes(term) || product.category?.name.toLowerCase().includes(term),
     );
   }, [items, search]);
 
@@ -92,7 +96,12 @@ export const ProductsPage = () => {
           action={!search && <Button onClick={openCreateModal}>+ Nuevo producto</Button>}
         />
       ) : (
-        <ProductTable products={filteredProducts} onEdit={openEditModal} onDelete={setDeletingProduct} />
+        <ProductTable
+          products={filteredProducts}
+          onEdit={openEditModal}
+          onDelete={setDeletingProduct}
+          onViewStock={setStockProduct}
+        />
       )}
 
       <ProductFormModal
@@ -102,6 +111,8 @@ export const ProductsPage = () => {
         isSaving={mutationStatus === 'loading'}
         product={editingProduct}
       />
+
+      <ProductStockModal isOpen={Boolean(stockProduct)} onClose={() => setStockProduct(null)} product={stockProduct} />
 
       <ConfirmDialog
         isOpen={Boolean(deletingProduct)}

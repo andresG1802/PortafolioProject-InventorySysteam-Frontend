@@ -1,5 +1,5 @@
 import { axiosInstance } from './axiosInstance';
-import type { CreateProductPayload, Product, UpdateProductPayload } from '../types';
+import type { CreateProductPayload, Product, ProductStock, UpdateProductPayload } from '../types';
 
 export const productsApi = {
   getAll: async () => {
@@ -8,6 +8,10 @@ export const productsApi = {
   },
   getById: async (id: string) => {
     const { data } = await axiosInstance.get<Product>(`/products/${id}`);
+    return data;
+  },
+  getStock: async (id: string) => {
+    const { data } = await axiosInstance.get<ProductStock>(`/products/${id}/stock`);
     return data;
   },
   create: async (payload: CreateProductPayload) => {

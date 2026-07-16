@@ -2,9 +2,11 @@ export interface Product {
   id: string;
   name: string;
   price: number;
-  stock: number;
   description?: string | null;
-  category?: string | null;
+  categoryId?: string | null;
+  supplierId?: string | null;
+  category?: { id: string; name: string } | null;
+  supplier?: { id: string; name: string } | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -12,9 +14,15 @@ export interface Product {
 export interface CreateProductPayload {
   name: string;
   price: number;
-  stock: number;
   description?: string;
-  category?: string;
+  categoryId?: string;
+  supplierId?: string;
 }
 
 export type UpdateProductPayload = Partial<CreateProductPayload>;
+
+export interface ProductStock {
+  productId: string;
+  total: number;
+  byWarehouse: { warehouseId: string; quantity: number }[];
+}

@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import clsx from 'clsx';
 import type { Product } from '../../types';
 import { formatCurrency } from '../../helpers';
 
@@ -7,15 +6,10 @@ interface ProductTableProps {
   products: Product[];
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
+  onViewStock: (product: Product) => void;
 }
 
-const stockBadge = (stock: number) => {
-  if (stock === 0) return 'bg-rose-500/10 text-rose-400';
-  if (stock <= 5) return 'bg-amber-500/10 text-amber-400';
-  return 'bg-emerald-500/10 text-emerald-400';
-};
-
-export const ProductTable = ({ products, onEdit, onDelete }: ProductTableProps) => (
+export const ProductTable = ({ products, onEdit, onDelete, onViewStock }: ProductTableProps) => (
   <div className="overflow-hidden rounded-2xl border border-slate-800">
     <div className="overflow-x-auto">
       <table className="w-full text-left text-sm">
@@ -23,8 +17,8 @@ export const ProductTable = ({ products, onEdit, onDelete }: ProductTableProps) 
           <tr>
             <th className="px-5 py-3 font-medium">Nombre</th>
             <th className="px-5 py-3 font-medium">Categoría</th>
+            <th className="px-5 py-3 font-medium">Proveedor</th>
             <th className="px-5 py-3 font-medium">Precio</th>
-            <th className="px-5 py-3 font-medium">Stock</th>
             <th className="px-5 py-3 font-medium text-right">Acciones</th>
           </tr>
         </thead>
@@ -45,15 +39,18 @@ export const ProductTable = ({ products, onEdit, onDelete }: ProductTableProps) 
                     <div className="max-w-xs truncate text-xs text-slate-500">{product.description}</div>
                   )}
                 </td>
-                <td className="px-5 py-3 text-slate-400">{product.category || '—'}</td>
+                <td className="px-5 py-3 text-slate-400">{product.category?.name || '—'}</td>
+                <td className="px-5 py-3 text-slate-400">{product.supplier?.name || '—'}</td>
                 <td className="px-5 py-3 text-slate-300">{formatCurrency(product.price)}</td>
                 <td className="px-5 py-3">
-                  <span className={clsx('rounded-full px-2.5 py-1 text-xs font-medium', stockBadge(product.stock))}>
-                    {product.stock} u.
-                  </span>
-                </td>
-                <td className="px-5 py-3">
                   <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onViewStock(product)}
+                      className="rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-800"
+                    >
+                      Ver stock
+                    </button>
                     <button
                       type="button"
                       onClick={() => onEdit(product)}
